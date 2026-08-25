@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.3.3</version> <!-- Using a highly stable release -->
+		<relativePath/> 
+	</parent>
+	
+	<groupId>com.logistics</groupId>
+	<artifactId>demo</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+	
+	<dependencies>
+		<!-- 1. The Core Web Starter (Fixed name) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+		<!-- 2. The Core WebSocket Starter -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
+		<!-- 3. Microsoft ONNX Runtime -->
+		<dependency>
+            <groupId>com.microsoft.onnxruntime</groupId>
+    		<artifactId>onnxruntime</artifactId>
+    		<version>1.18.0</version> 
+		</dependency>
+
+		<!-- 4. The Core Test Starter -->
+		<dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter-test</artifactId>
+        	<scope>test</scope>
+    	</dependency>
+    	<dependency>
+    		<groupId>ws.schild</groupId>
+    		<artifactId>jave-all-deps</artifactId>
+    		<version>3.3.1</version>
+		</dependency>
+		<!-- 5. Gatling Load Testing -->
+		<dependency>
+    		<groupId>io.gatling</groupId>
+    		<artifactId>gatling-app</artifactId>
+    		<version>3.11.5</version>
+    		<scope>test</scope>
+		</dependency>
+		<dependency>
+    		<groupId>io.gatling.highcharts</groupId>
+    		<artifactId>gatling-charts-highcharts</artifactId>
+    		<version>3.11.5</version>
+    		<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+    			<groupId>io.gatling</groupId>
+    			<artifactId>gatling-maven-plugin</artifactId>
+    			<version>4.9.0</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>

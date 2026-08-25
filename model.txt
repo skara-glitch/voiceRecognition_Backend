@@ -1,0 +1,56 @@
+# run it on https://colab.research.google.com/drive and paste the extracted 
+# file into src/main/resources/models
+!pip install transformers torch onnx onnxscript
+
+import torch
+import torch.nn as nn
+from transformers import Wav2Vec2Model
+import os
+import zipfile
+from google.colab import files
+
+print("1. Downloading real Wav2Vec2 model...")
+hf_model_name = "facebook/wav2vec2-base"
+
+class RealVoiceClassifier(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.wav2vec2 = Wav2Vec2Model.from_pretrained(hf_model_name)
+        self.fc_gender = nn.Linear(768, 2)
+        self.fc_age = nn.Linear(768, 4)
+        self.fc_lang = nn.Linear(768, 3)
+
+    def forward(self, input_values):
+        outputs = self.wav2vec2(input_values)
+        hidden_states = outputs.last_hidden_state.mean(dim=1)
+        gender_probs = torch.softmax(self.fc_gender(hidden_states), dim=1)
+        age_probs = torch.softmax(self.fc_age(hidden_states), dim=1)
+        lang_probs = torch.softmax(self.fc_lang(hidden_states), dim=1)
+        return gender_probs, age_probs, lang_probs
+
+print("2. Exporting to ONNX format...")
+model = RealVoiceClassifier()
+model.eval()
+dummy_audio = torch.randn(1, 16000)
+onnx_filename = "real_wav2vec2_classifier.onnx"
+
+torch.onnx.export(
+    model, dummy_audio, onnx_filename,
+    export_params=True, opset_version=14,
+    input_names=["input_values"],
+    output_names=["gender_probs", "age_probs", "lang_probs"],
+    dynamic_axes={"input_values": {1: "sequence_length"}}
+)
+
+print("3. Zipping the model and its external data weights...")
+zip_name = "model_bundle.zip"
+with zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED) as zf:
+    zf.write(onnx_filename)
+    # Check if PyTorch generated the external weights file and add it
+    if os.path.exists(onnx_filename + ".data"):
+        zf.write(onnx_filename + ".data")
+    elif os.path.exists(onnx_filename + "_data"): # sometimes it uses an underscore
+        zf.write(onnx_filename + "_data")
+
+print("Success! Downloading zip bundle...")
+files.download(zip_name)
